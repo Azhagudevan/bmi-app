@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BMI Calculator</title>
+
+  <style>
+    :root{
+      --accent: #6366f1;
+      --accent-2:#22d3ee;
+      --text: #e5e7eb;
+      --muted:#94a3b8;
+      --ok:#22c55e;
+      --warn:#f59e0b;
+      --err:#ef4444;
+    }
+
+    * { box-sizing: border-box; }
+    body{
+      margin:0;
+      font-family: "Segoe UI", Roboto, Arial, sans-serif;
+      color: var(--text);
+      background: linear-gradient(135deg, #0f172a, #1e293b, #0f172a);
+      background-size: 300% 300%;
+      animation: gradient 15s ease infinite;
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      padding: 20px;
+    }
+    @keyframes gradient {
+      0%{ background-position: 0% 50%; }
+      50%{ background-position: 100% 50%; }
+      100%{ background-position: 0% 50%; }
+    }
+
+    header{
+      padding: 20px;
+      text-align:center;
+      background: linear-gradient(90deg, rgba(99,102,241,.15), rgba(34,211,238,.15));
+    }
+    header h1{ margin:0; font-size:2rem; font-weight:700; }
+    header p{ margin:6px 0 0; color:var(--muted); }
+
+    main{
+      flex:1;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:30px;
+      align-items:start;
+      padding: 30px;
+    }
+    @media(max-width:768px){
+      main{ grid-template-columns:1fr; }
+    }
+
+    section{
+      background: rgba(0,0,0,.35);
+      padding:20px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.1);
+    }
+    section h2{ margin-top:0; font-size:1.2rem; }
+
+    label{ display:block; margin-bottom:6px; color:var(--muted);}
+    input[type="number"]{
+      width:100%; padding:12px;
+      border-radius:8px; border:1px solid rgba(255,255,255,.2);
+      background:#0b1220; color:var(--text);
+      margin-bottom:14px;
+    }
+    input[type="number"]:focus{
+      border-color: var(--accent);
+      outline:none;
+    }
+
+    .actions{ display:flex; gap:10px; flex-wrap:wrap; }
+    button{
+      padding:12px 18px;
+      border:none; border-radius:8px;
+      font-weight:700; cursor:pointer;
+      transition:.2s;
+    }
+    .btn-primary{
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color:#0b1220;
+    }
+    .btn-primary:hover{ filter:brightness(1.1);}
+    .btn-ghost{
+      background:transparent; color:var(--text);
+      border:1px solid rgba(255,255,255,.2);
+    }
+
+    .bmi-number{ font-size:2.5rem; font-weight:800; }
+    .badge{
+      display:inline-block; margin-top:6px;
+      padding:6px 12px; border-radius:999px; font-weight:700;
+    }
+    .badge.ok{ background: rgba(34,197,94,.18); color:#86efac;}
+    .badge.warn{ background: rgba(245,158,11,.18); color:#fcd34d;}
+    .badge.err{ background: rgba(239,68,68,.18); color:#fca5a5;}
+    .badge.muted{ background: rgba(148,163,184,.15); color:#cbd5e1;}
+
+    .scale{
+      margin-top:15px; border-radius:10px; overflow:hidden;
+      display:grid; grid-template-columns:1fr 1.4fr 1.2fr 1.1fr;
+      border:1px solid rgba(255,255,255,.2);
+    }
+    .scale span{
+      padding:10px; text-align:center; font-size:.85rem; font-weight:700;
+    }
+    .scale .active{ outline:2px solid white; filter:brightness(1.15);}
+    .note{ margin-top:10px; color:var(--muted);}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>BMI Calculator</h1>
+    <p>Check your Body Mass Index instantly</p>
+  </header>
+
+  <main>
+    <!-- Input -->
+    <section>
+      <h2>Your Details</h2>
+      <label for="height">Height (cm)</label>
+      <input id="height" type="number" min="50" max="250" step="0.1" placeholder="e.g. 170">
+      <label for="weight">Weight (kg)</label>
+      <input id="weight" type="number" min="10" max="300" step="0.1" placeholder="e.g. 65">
+
+      <div class="actions">
+        <button class="btn-primary" id="calcBtn">Calculate</button>
+        <button class="btn-ghost" id="resetBtn">Reset</button>
+      </div>
+    </section>
+
+    <!-- Result -->
+    <section>
+      <h2>Result</h2>
+      <div class="bmi-number" id="bmiValue">—</div>
+      <div id="bmiBadge" class="badge muted">Awaiting input</div>
+
+      <div class="scale">
+        <span id="sUnder">Under<br><small>&lt;18.5</small></span>
+        <span id="sNormal">Normal<br><small>18.5–24.9</small></span>
+        <span id="sOver">Over<br><small>25–29.9</small></span>
+        <span id="sObese">Obese<br><small>≥30</small></span>
+      </div>
+
+      <p id="msg" class="note">Enter height and weight to see your BMI.</p>
+      <p id="ideal" class="note"></p>
+    </section>
+  </main>
+
+  <script>
+    const heightEl=document.getElementById("height"),
+          weightEl=document.getElementById("weight"),
+          bmiValue=document.getElementById("bmiValue"),
+          bmiBadge=document.getElementById("bmiBadge"),
+          msg=document.getElementById("msg"),
+          ideal=document.getElementById("ideal"),
+          [sUnder,sNormal,sOver,sObese]=["sUnder","sNormal","sOver","sObese"].map(id=>document.getElementById(id));
+
+    function clearActive(){ [sUnder,sNormal,sOver,sObese].forEach(s=>s.classList.remove("active")); }
+    function setBadge(text,type){ bmiBadge.className="badge "+(type||"muted"); bmiBadge.textContent=text; }
+
+    function calculate(){
+      const hCm=parseFloat(heightEl.value), wKg=parseFloat(weightEl.value);
+      if(!hCm||!wKg){ resetResult(); return; }
+      const hM=hCm/100, bmi=wKg/(hM*hM), bmiRounded=bmi.toFixed(2);
+
+      let cat="",badge="muted"; clearActive();
+      if(bmi<18.5){ cat="Underweight"; badge="warn"; sUnder.classList.add("active"); }
+      else if(bmi<25){ cat="Normal"; badge="ok"; sNormal.classList.add("active"); }
+      else if(bmi<30){ cat="Overweight"; badge="warn"; sOver.classList.add("active"); }
+      else{ cat="Obese"; badge="err"; sObese.classList.add("active"); }
+
+      bmiValue.textContent=bmiRounded; setBadge(cat,badge);
+      msg.textContent=(cat==="Normal")?"You are in the healthy range.":"Consider healthy habits for improvement.";
+      ideal.textContent=`Ideal weight for your height: ${(18.5*hM*hM).toFixed(1)} – ${(24.9*hM*hM).toFixed(1)} kg`;
+    }
+    function resetResult(){
+      bmiValue.textContent="—"; setBadge("Awaiting input","muted");
+      clearActive(); msg.textContent="Enter height and weight to see your BMI."; ideal.textContent="";
+    }
+    function resetAll(){ heightEl.value=""; weightEl.value=""; resetResult(); }
+
+    document.getElementById("calcBtn").addEventListener("click",calculate);
+    document.getElementById("resetBtn").addEventListener("click",resetAll);
+    [heightEl,weightEl].forEach(el=>el.addEventListener("input",calculate));
+  </script>
+</body>
+</html>
