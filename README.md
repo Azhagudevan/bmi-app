@@ -15,24 +15,26 @@ The repository contains the following files:
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/YourUsername/YourRepoName.git
-   cd YourRepoName
+   git clone https://github.com/Azhagudevan/bmi-app.git
+   cd bmi-app```
+
 2. Build the Docker image:
-
-   docker build -t mywebapp .
+   ```bash
+   docker build -t bmi-app ```
+   
 3. Run the container:
+   ```bash
+   docker run -d -p 8080:80 bmi-app```
 
-  docker run -d -p 8080:80 mywebapp
+4. Open in browser:
+    http://localhost:8080
 
-4.Open in browser:
-   http://localhost:8080
 
-📖 Learning Outcomes
- Through this project, I learned:
-
- *Basics of Dockerfile and image creation
- *Running a web server using Docker
- *Mapping container ports to host machine
- *Managing containers (start/stop/remove)
- *Hosting a simple static website with Docker
+## 📖 Learning Outcomes
+Through this project, I learned:
+ - Basics of Dockerfile and image creation
+ - Running a web server using Docker
+ - Mapping container ports to host machine
+ - Managing containers (start/stop/remove)
+ - Hosting a simple static website with Docker
 
