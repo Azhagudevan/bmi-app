@@ -32,39 +32,39 @@ To build and deploy a simple **BMI Calculator web application** using **Docker**
 2. Wrote a **`Dockerfile`** to serve the HTML file using **nginx** web server.  
 3. Built the Docker image using the command:  
    ```sh
-   docker build -t bmi-app .
+   docker build -t bmi-app ```
    
-  Ran the container using:
-   docker run -d -p 8080:80 bmi-app
+4. Ran the container using:
+   ```sh
+   docker run -d -p 8080:80 bmi-app```
 
-
-  Accessed the BMI Calculator in browser at:
+5. Accessed the BMI Calculator in browser at:
    http://localhost:8080
 
 
-Dockerfile used:
+## Dockerfile used:
 FROM nginx:alpine
 COPY index.html /usr/share/nginx/html/index.html
 
-Source Code
+## Source Code
    The complete source code is available in this repository:
-index.html
-Dockerfile
+- index.html
+- Dockerfile
 
 
-Advantages of Docker
- Lightweight and portable
- Easy to deploy applications
- Platform independent
- Provides consistency across environments
- Faster setup and testing
+## Advantages of Docker
+- Lightweight and portable
+- Easy to deploy applications
+- Platform independent
+- Provides consistency across environments
+- Faster setup and testing
 
-GitHub Repository
+## GitHub Repository
 
 👉 https://github.com/Azhagudevan/bmi-app
 
 
 
-Result
+## Result
 
 Thus, a BMI Calculator web application was successfully containerized and deployed using Docker.
